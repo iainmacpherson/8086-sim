@@ -1,9 +1,8 @@
 package main
 
 import (
-	"errors"
+	"flag"
 	"os"
-	"strconv"
 
 	"8086-sim/decoder"
 	"8086-sim/logger"
@@ -21,7 +20,7 @@ func check(e error) {
 
 func main() {
 	// get command line arguments
-	args := parseArguments(os.Args[1:])
+	args := parseArguments()
 	logger.Initialise(args.verbosity)
 	logger.LogInf(NAME, "8086-sim started, reading input program.")
 
@@ -59,28 +58,22 @@ type cmdlineArgs struct {
 	verbosity int
 }
 
-func parseArguments(provided_args []string) cmdlineArgs {
-	// TODO(iain): improve command line argument handling
+/*
+	Parses the commandline arguments using the Flag package.
+*/
+func parseArguments() cmdlineArgs {
+	filepathPtr := flag.String("in", "", "The filepath to the executable program binary")
+	vLevelPtr := flag.Int("verbosity", 0, "The numeric indicator for the verbosity level required.\n 0: Errors only\n 1: Warnings\n 2: Debug messages\n 3: Information messages\n")
+	vAllPtr := flag.Bool("v", false, "Enables all logging output at the high verbosity level.\n Overrides other verbosity settings.")
+
+	flag.Parse()
+
 	args := cmdlineArgs{}
-
-	// Check if we have the correct arguments
-	if len(provided_args) < MIN_ARGS || len(provided_args) > MAX_ARGS {
-		logger.LogErr(NAME, "Provide a minimum of one argument: the path to the binary")
-		panic(errors.New("IncorrectArgs"))
-	}
-
-	// parse the filepath
-	args.filepath = provided_args[0]
-
-	// parse the verbosity level
-	if len(provided_args) > 1 {
-		if provided_args[1] == "-v" {
-			args.verbosity = logger.INFO
-		} else if len(provided_args[1]) > 2 && provided_args[1][0:2] == "-v" {
-			args.verbosity, _ = strconv.Atoi(string(provided_args[1][2]))
-		} else {
-			logger.LogErr(NAME, "Unknown additional argument provided, ignored.")
-		}
+	args.filepath = *filepathPtr
+	if *vAllPtr {
+		args.verbosity = logger.INFO
+	} else {
+		args.verbosity = *vLevelPtr
 	}
 
 	return args
@@ -88,7 +81,10 @@ func parseArguments(provided_args []string) cmdlineArgs {
 
 func readInputProgram(filepath string) []byte {
 	file_data, err := os.ReadFile(filepath)
-	check(err)
+	if err != nil {
+		logger.LogfErr(NAME, "Error reading input program. Please ensure that the correct path was provided. Use -h for help.\n\n" + err.Error())
+		os.Exit(1)
+	}
 
 	return file_data
 }
