@@ -5,12 +5,21 @@ import (
 	"os"
 )
 
+const NAME = "LOG"
+
 const (
 	ERROR int = 0
 	WARN      = 1
 	DEBUG     = 2
 	INFO      = 3
 )
+
+var LogLevels = map[int]string {
+	ERROR: "ERROR",
+	WARN: "WARN",
+	DEBUG: "DEBUG",
+	INFO: "INFO",
+}
 
 type logger struct {
 	log_level int
@@ -20,6 +29,7 @@ var l = &logger{}
 
 func Initialise(log_level int) {
 	l.log_level = log_level
+	LogInf(NAME, "Logger initialised with level " + LogLevels[log_level] + ".")
 }
 
 func LogRaw(message string) {
