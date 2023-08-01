@@ -7,7 +7,7 @@ import (
 
 const (
 	ERROR int = 0
-	WARN 	  = 1
+	WARN      = 1
 	DEBUG     = 2
 	INFO      = 3
 )
@@ -32,7 +32,7 @@ func LogfRaw(message string, params ...interface{}) {
 }
 
 func LogErr(module string, message string) {
-	fmt.Fprint(os.Stderr, "[ERR] " + module + ": " + message)
+	fmt.Fprint(os.Stderr, "[ERR] "+module+": "+message)
 	fmt.Println()
 }
 
@@ -79,4 +79,3 @@ func LogInf(module string, message string) {
 		fmt.Println("[INF] " + module + ": " + message)
 	}
 }
-
