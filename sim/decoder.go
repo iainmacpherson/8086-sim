@@ -12,22 +12,11 @@ type DecodedInstruction struct {
 	DesRegCode uint8
 }
 
-func readByte(program []byte, byte_count int) (uint8, int) {
-	var byte_read byte = program[byte_count]
-	byte_count++
-	return byte_read, byte_count
-}
-
-/*
-Decode the next instruction in the array of bytes passed.
-returns: number of bytes consumed.
-*/
-func DecodeInstruction(program []byte) (int, DecodedInstruction) {
-	var byte_count int = 0
-	var byte_read uint8 = 0
+func DecodeNextInstruction(istream *InstructionStream) DecodedInstruction {
+	logger.LogInf(NAME, "Decoding Next Instruction")
 	var decoded_instr = DecodedInstruction{}
 	// read byte
-	byte_read, byte_count = readByte(program, byte_count)
+	byte_read := InstructionStreamPopByte(istream)
 
 	// decode based on opcode
 	decoded_instr.Opcode = (byte_read >> 2) & 0b00111111
@@ -37,7 +26,7 @@ func DecodeInstruction(program []byte) (int, DecodedInstruction) {
 		var wbit uint8 = byte_read & 0b1
 
 		// read next byte
-		byte_read, byte_count = readByte(program, byte_count)
+		byte_read = InstructionStreamPopByte(istream)
 
 		var modbits uint8 = (byte_read >> 6) & 0b11
 		// TODO(iain): currenly only reg to reg operations are supported
@@ -55,6 +44,5 @@ func DecodeInstruction(program []byte) (int, DecodedInstruction) {
 		panic(errors.New("UnimplementedError"))
 	}
 
-	logger.LogfInf(NAME, "Decoded instruction, consumed %d bytes", byte_count)
-	return byte_count, decoded_instr
+	return decoded_instr
 }
