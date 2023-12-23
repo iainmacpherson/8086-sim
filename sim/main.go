@@ -16,6 +16,7 @@ type cmdlineArgs struct {
 	filepath    string
 	verbosity   int
 	disassemble bool
+	execute     bool
 }
 
 /*
@@ -25,7 +26,8 @@ func parseArguments() cmdlineArgs {
 	filepathPtr := flag.String("in", "", "The filepath to the executable program binary")
 	vLevelPtr := flag.Int("verbosity", 0, "The numeric indicator for the verbosity level required.\n 0: Errors only\n 1: Warnings\n 2: Debug messages\n 3: Information messages\n")
 	vAllPtr := flag.Bool("v", false, "Enables all logging output at the high verbosity level.\n Overrides other verbosity settings.")
-	disassemblePtr := flag.Bool("disassemble", false, "Outputs the disassembly of the input program.")
+	disassemblePtr := flag.Bool("disassemble", true, "Outputs the disassembly of the input program.")
+	executePtr := flag.Bool("execute", false, "Executes the input program [currently unsupported].")
 
 	flag.Parse()
 
@@ -37,11 +39,12 @@ func parseArguments() cmdlineArgs {
 		args.verbosity = *vLevelPtr
 	}
 	args.disassemble = *disassemblePtr
+	args.execute = *executePtr
 
 	return args
 }
 
-func Disassemble(istream *InstructionStream) {
+func Disassemble(istream *DataStream) {
 	// output the required directive to indicate the x86 flavour.
 	logger.LogRaw("bits 16")
 	cpu_running := true
@@ -49,20 +52,18 @@ func Disassemble(istream *InstructionStream) {
 		// Decode
 		decoded_instr := DecodeNextInstruction(istream)
 
-		// disassemble
-		logger.LogfRaw("%s %s, %s",
-			OpcodeMnemonics[decoded_instr.Opcode],
-			RegNames[decoded_instr.DesRegCode],
-			RegNames[decoded_instr.SrcRegCode])
-
-		// Check if we have finished executing all instructions
-		if InstructionStreamIsEmpty(istream) {
+		if decoded_instr != nil {
+			// disassemble
+			decoded_instr.Runnable.Disassemble(decoded_instr)
+		}
+		if istream.IsEmpty() {
+			// Check if we have finished executing all instructions
 			cpu_running = false
 		}
 	}
 }
 
-func Execute(istream *InstructionStream) {
+func Execute(istream *DataStream) {
 	// TODO(iain)
 	panic(errors.New("Unimplemented"))
 }
@@ -74,15 +75,15 @@ func main() {
 	logger.LogInf(NAME, "8086-sim started, reading input program.")
 
 	// read input program
-	instruction_stream := InstructionStreamCreate(args.filepath)
+	istream := DataStreamCreate(args.filepath)
 
 	if args.disassemble {
-		Disassemble(instruction_stream)
-	} else {
-		Execute(instruction_stream)
+		Disassemble(istream)
+	}
+	if args.execute {
+		Execute(istream)
 	}
 
 	// clean up and terminate
 	logger.LogInf(NAME, "8086-sim completed, terminating.")
 }
-
