@@ -76,3 +76,21 @@ var RegNames = map[uint8]string{
 	Registers.AX: "ax", Registers.CX: "cx", Registers.DX: "dx", Registers.BX: "bx",
 	Registers.SP: "sp", Registers.BP: "bp", Registers.SI: "si", Registers.DI: "di",
 }
+
+var AddressingRegs = map[uint8]string{
+	0b000: "bx + si",
+	0b001: "bx + di",
+	0b010: "bp + si",
+	0b011: "bp + di",
+	0b100: "si",
+	0b101: "di",
+	0b110: "bp",
+	0b111: "bx",
+}
+
+var SegRegNames = map[uint8]string{
+	0b00: "es",
+	0b01: "cs",
+	0b10: "ss",
+	0b11: "ds",
+}

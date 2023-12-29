@@ -55,6 +55,7 @@ func Disassemble(istream *DataStream) {
 		if decoded_instr != nil {
 			// disassemble
 			decoded_instr.Runnable.Disassemble(decoded_instr)
+			logger.LogRaw(decoded_instr.Disassembly)
 		}
 		if istream.IsEmpty() {
 			// Check if we have finished executing all instructions
