@@ -8,12 +8,11 @@ Written for fun and practice learning go.
 ## Current state of the project
 Currently, this project is only capable of decoding and outputting a disassembly of a binary containing a limited subset of the instructions supported by the 8086, and it does not support execution of any.
 ### Supported Instructions
-#### Decoding:
-* MOV
-#### Disassembly:
-* MOV
-#### Execution:
-* None
+
+| Instruciton | Decoding | Disassembly | Execution |
+| --- | :---: | :---: | :---: |
+| MOV | y | y | n |
+
 
 ### Future Plans
 This is very much in a proof of concept phase at the moment.
