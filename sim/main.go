@@ -4,6 +4,7 @@ import (
 	"errors"
 	"flag"
 
+	ds "8086-sim/datastream"
 	"8086-sim/logger"
 )
 
@@ -44,7 +45,7 @@ func parseArguments() cmdlineArgs {
 	return args
 }
 
-func Disassemble(istream *DataStream) {
+func Disassemble(istream *ds.DataStream) {
 	// output the required directive to indicate the x86 flavour.
 	logger.LogRaw("bits 16")
 	cpu_running := true
@@ -64,7 +65,7 @@ func Disassemble(istream *DataStream) {
 	}
 }
 
-func Execute(istream *DataStream) {
+func Execute(istream *ds.DataStream) {
 	// TODO(iain)
 	panic(errors.New("Unimplemented"))
 }
@@ -76,7 +77,7 @@ func main() {
 	logger.LogInf(NAME, "8086-sim started, reading input program.")
 
 	// read input program
-	istream := DataStreamCreate(args.filepath)
+	istream := ds.DataStreamCreateFromFile(args.filepath)
 
 	if args.disassemble {
 		Disassemble(istream)

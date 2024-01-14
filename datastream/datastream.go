@@ -1,4 +1,4 @@
-package main
+package datastream
 
 import (
 	"8086-sim/logger"
@@ -6,13 +6,14 @@ import (
 	"os"
 )
 
+const NAME = "DATASTREAM"
+
 type DataStream struct {
 	data   []byte
 	offset uint
 }
 
-func DataStreamCreate(filepath string) *DataStream {
-
+func DataStreamCreateFromFile(filepath string) *DataStream {
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		logger.LogfErr(NAME, "Error reading input program. Please ensure that the correct path was provided. Use -h for help.\n\n")
@@ -25,11 +26,18 @@ func DataStreamCreate(filepath string) *DataStream {
 	}
 }
 
+func DataStreamCreateFromData(data []byte) *DataStream {
+	return &DataStream{
+		data:   data,
+		offset: 0,
+	}
+}
+
 func (ds *DataStream) TryPopBits(numBits uint) (uint8, uint) {
 	var result uint8
 	var startOffset uint = ds.offset
 	for i := uint(0); i < numBits; i++ {
-		if startOffset+i <= uint(len(ds.data)*8) {
+		if startOffset+i < uint(len(ds.data)*8) {
 			byteOffset := ds.offset / 8
 			bitOffset := 7 - ds.offset%8
 			bitValue := ds.data[byteOffset] >> bitOffset
@@ -41,27 +49,6 @@ func (ds *DataStream) TryPopBits(numBits uint) (uint8, uint) {
 		}
 	}
 	return result, ds.offset - startOffset
-}
-
-func (ds *DataStream) TryPopBytes(numBytes uint) ([]byte, uint) {
-	var result []byte
-	var bytesRead uint
-	// check byte aligned
-	if ds.offset%8 != 0 {
-		logger.LogErr(NAME, "Attempting to read a byte from data stream but not byte aligned.")
-		panic(errors.New("UnalignedRead"))
-	}
-	// check there are enough bytes left
-	byteOffset := ds.offset / 8
-	if (byteOffset)+numBytes < uint(len(ds.data)) {
-		bytesRead = numBytes
-	} else {
-		bytesRead = uint(len(ds.data)) - byteOffset
-	}
-	result = ds.data[byteOffset : byteOffset+bytesRead]
-	ds.offset += 8 * bytesRead
-
-	return result, bytesRead
 }
 
 func (ds *DataStream) TryPopByte() (byte, bool) {

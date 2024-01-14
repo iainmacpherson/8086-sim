@@ -1,12 +1,13 @@
 package main
 
 import (
+	ds "8086-sim/datastream"
 	"8086-sim/logger"
 	"errors"
 	"fmt"
 )
 
-func decodeMOV(istream *DataStream, instr *Instruction) {
+func decodeMOV(istream *ds.DataStream, instr *Instruction) {
 	logger.LogfInf(NAME, "Decoding MOV instruction. First Byte = 0x%x", instr.FirstByte)
 
 	if Opcodes.MOV_RM_TF_R == (instr.FirstByte >> 2) {

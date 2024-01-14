@@ -1,6 +1,7 @@
 package main
 
 import (
+	ds "8086-sim/datastream"
 	"8086-sim/logger"
 	"errors"
 )
@@ -280,12 +281,12 @@ var InstructionLookup = [...]InstructionFunctions{
 	0xFF: {DecodeFields: decodeUnimplemented, Disassemble: disassembleUnimplemented, Execute: executeUnimplemented},
 }
 
-func decodeUnimplemented(istream *DataStream, instr *Instruction) {
+func decodeUnimplemented(istream *ds.DataStream, instr *Instruction) {
 	logger.LogfErr(NAME, "Attempting to decode unimplemented instruction. First byte = 0x%x", instr.FirstByte)
 	panic(errors.New("UnimplementedError"))
 }
 
-func decodeIllegal(istream *DataStream, instr *Instruction) {
+func decodeIllegal(istream *ds.DataStream, instr *Instruction) {
 	logger.LogfErr(NAME, "Attempting to decode illegal instruction. First byte = 0x%x", instr.FirstByte)
 	panic(errors.New("IllegalInstruction"))
 }

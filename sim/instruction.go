@@ -1,6 +1,7 @@
 package main
 
 import (
+	ds "8086-sim/datastream"
 	"8086-sim/logger"
 	"fmt"
 )
@@ -43,12 +44,12 @@ type Instruction struct {
 }
 
 type InstructionFunctions struct {
-	DecodeFields func(*DataStream, *Instruction)
+	DecodeFields func(*ds.DataStream, *Instruction)
 	Disassemble  func(*Instruction) // call to disassemble this instruction
 	Execute      func(*Instruction) // call to execute this instruction
 }
 
-func DecodeNextInstruction(istream *DataStream) *Instruction {
+func DecodeNextInstruction(istream *ds.DataStream) *Instruction {
 	if istream.IsEmpty() {
 		return nil
 	}
