@@ -14,6 +14,10 @@ Currently, this project is only capable of decoding and outputting a disassembly
 | MOV | y | y | n | Transfer a byte or word from source to destination. |
 | PUSH | n | n | n | Decrements the stack pointer and transfers a word from the source to the stack. |
 
+### Current TODO list
+* implement disassembly for push
+    * disambiguate properly between operations with the same first byte
+        * need to implement a peak function in DataStream
 
 ### Future Plans
 This is very much in a proof of concept phase at the moment.

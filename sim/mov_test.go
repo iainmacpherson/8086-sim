@@ -5,7 +5,7 @@ import (
 	"testing"
 )
 
-func TestDisassembleMov(t *testing.T) {
+func TestDisassembleMOV(t *testing.T) {
 	var tests = []struct {
 		name                 string
 		input                []byte
