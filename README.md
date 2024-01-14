@@ -9,9 +9,10 @@ Written for fun and practice learning go.
 Currently, this project is only capable of decoding and outputting a disassembly of a binary containing a limited subset of the instructions supported by the 8086, and it does not support execution of any.
 ### Supported Instructions
 
-| Instruciton | Decoding | Disassembly | Execution |
-| --- | :---: | :---: | :---: |
-| MOV | y | y | n |
+| Instruction | Decoding | Disassembly | Execution | Description |
+| --- | :---: | :---: | :---: | --- |
+| MOV | y | y | n | Transfer a byte or word from source to destination. |
+| PUSH | n | n | n | Decrements the stack pointer and transfers a word from the source to the stack. |
 
 
 ### Future Plans

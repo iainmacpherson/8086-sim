@@ -20,6 +20,28 @@ type cmdlineArgs struct {
 	execute     bool
 }
 
+func main() {
+	// get command line arguments
+	args := parseArguments()
+	logger.Initialise(args.verbosity)
+	logger.LogInf(NAME, "8086-sim started, reading input program.")
+
+	// read input program
+	istream := ds.DataStreamCreateFromFile(args.filepath)
+
+	decoded_instructions := Decode(istream)
+
+	if args.disassemble {
+		printDisassembly(Disassemble(decoded_instructions))
+	}
+	if args.execute {
+		Execute(decoded_instructions)
+	}
+
+	// clean up and terminate
+	logger.LogInf(NAME, "8086-sim completed, terminating.")
+}
+
 /*
 Parses the commandline arguments using the Flag package.
 */
@@ -45,47 +67,34 @@ func parseArguments() cmdlineArgs {
 	return args
 }
 
-func Disassemble(istream *ds.DataStream) {
-	// output the required directive to indicate the x86 flavour.
-	logger.LogRaw("bits 16")
-	cpu_running := true
-	for cpu_running {
-		// Decode
-		decoded_instr := DecodeNextInstruction(istream)
+func Decode(istream *ds.DataStream) []*Instruction {
+	var decoded_instructions []*Instruction
+	for !istream.IsEmpty() {
+		instr := DecodeNextInstruction(istream)
+		if instr != nil {
+			decoded_instructions = append(decoded_instructions, instr)
+		}
+	}
+	return decoded_instructions
+}
 
-		if decoded_instr != nil {
-			// disassemble
-			decoded_instr.Runnable.Disassemble(decoded_instr)
-			logger.LogRaw(decoded_instr.Disassembly)
-		}
-		if istream.IsEmpty() {
-			// Check if we have finished executing all instructions
-			cpu_running = false
-		}
+func Disassemble(instructions []*Instruction) []string {
+	var output []string
+	for _, instr := range instructions {
+		instr.Runnable.Disassemble(instr)
+		output = append(output, instr.Disassembly)
+	}
+	return output
+}
+
+func printDisassembly(disassembly []string) {
+	logger.LogRaw("bits 16")
+	for _, line := range disassembly {
+		logger.LogRaw(line)
 	}
 }
 
-func Execute(istream *ds.DataStream) {
+func Execute(instructions []*Instruction) {
 	// TODO(iain)
 	panic(errors.New("Unimplemented"))
-}
-
-func main() {
-	// get command line arguments
-	args := parseArguments()
-	logger.Initialise(args.verbosity)
-	logger.LogInf(NAME, "8086-sim started, reading input program.")
-
-	// read input program
-	istream := ds.DataStreamCreateFromFile(args.filepath)
-
-	if args.disassemble {
-		Disassemble(istream)
-	}
-	if args.execute {
-		Execute(istream)
-	}
-
-	// clean up and terminate
-	logger.LogInf(NAME, "8086-sim completed, terminating.")
 }

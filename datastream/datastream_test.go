@@ -150,7 +150,6 @@ func TestPopBitsAndByte(t *testing.T) {
 }
 
 func TestIsEmpty(t *testing.T) {
-
 	var tests = []struct {
 		name            string
 		expected_result bool
